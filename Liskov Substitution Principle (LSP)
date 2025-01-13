@@ -1,0 +1,163 @@
+Basic Explanation of LSP
+Imagine you have a toy store. You have a class called Toy that represents general toys. You also have a specific toy called CarToy.
+
+Now, let’s say you create a play() method in the Toy class that is supposed to make the toy "play its sound."
+
+Code Example:
+java
+Copy code
+class Toy {
+    public void play() {
+        System.out.println("The toy is playing a sound!");
+    }
+}
+
+class CarToy extends Toy {
+    @Override
+    public void play() {
+        System.out.println("The car toy is driving and making a vroom sound!");
+    }
+}
+This is fine because the CarToy can replace the Toy without breaking anything. If you call play() on either Toy or CarToy, it works as expected.
+
+Breaking LSP
+Now imagine adding a new toy: PuzzleToy, but you realize that a puzzle toy doesn't "play sound." If you still force the PuzzleToy to inherit from Toy and implement the play() method, it may break things.
+
+java
+Copy code
+class PuzzleToy extends Toy {
+    @Override
+    public void play() {
+        throw new UnsupportedOperationException("Puzzle toys don't play sounds!");
+    }
+}
+Usage:
+java
+Copy code
+public class Main {
+    public static void main(String[] args) {
+        Toy toy = new PuzzleToy();
+        toy.play(); // Throws an exception
+    }
+}
+This violates LSP because now the PuzzleToy cannot be used as a proper substitute for the Toy class. The program expects all Toy objects to be able to play(), but PuzzleToy breaks this expectation.
+
+Fixing LSP (Simple Way)
+To fix this, you can redesign the hierarchy:
+
+Use a base interface or class (Toy) for shared behavior (like display() or move()).
+Create specialized behaviors (PlayableToy for toys that can play sounds).
+java
+Copy code
+interface Toy {
+    void display();
+}
+
+interface PlayableToy extends Toy {
+    void play();
+}
+
+class CarToy implements PlayableToy {
+    @Override
+    public void display() {
+        System.out.println("This is a car toy!");
+    }
+
+    @Override
+    public void play() {
+        System.out.println("The car toy is driving and making a vroom sound!");
+    }
+}
+
+class PuzzleToy implements Toy {
+    @Override
+    public void display() {
+        System.out.println("This is a puzzle toy!");
+    }
+}
+Now PuzzleToy no longer has to implement a play() method, and you can use CarToy and PuzzleToy appropriately.
+
+Advanced Real-World Example
+Let’s consider a real-world banking system.
+
+Scenario Without LSP:
+Imagine you have a base class called Account with a method withdraw(). Both SavingsAccount and FixedDepositAccount extend this class.
+
+java
+Copy code
+class Account {
+    public void withdraw(double amount) {
+        System.out.println("Withdraw " + amount);
+    }
+}
+
+class SavingsAccount extends Account {
+    @Override
+    public void withdraw(double amount) {
+        System.out.println("Withdraw " + amount + " from savings account.");
+    }
+}
+
+class FixedDepositAccount extends Account {
+    @Override
+    public void withdraw(double amount) {
+        throw new UnsupportedOperationException("Cannot withdraw from a fixed deposit account!");
+    }
+}
+Usage:
+java
+Copy code
+Account account = new FixedDepositAccount();
+account.withdraw(500); // Throws an exception
+This violates LSP because the FixedDepositAccount doesn't behave like a true Account—you cannot withdraw from it.
+
+Fixing LSP:
+Redesign the system by separating withdrawable accounts and non-withdrawable accounts.
+
+java
+Copy code
+abstract class Account {
+    public abstract void showBalance();
+}
+
+class WithdrawableAccount extends Account {
+    public void withdraw(double amount) {
+        System.out.println("Withdraw " + amount);
+    }
+
+    @Override
+    public void showBalance() {
+        System.out.println("Showing balance.");
+    }
+}
+
+class FixedDepositAccount extends Account {
+    @Override
+    public void showBalance() {
+        System.out.println("Showing fixed deposit balance.");
+    }
+}
+Usage:
+java
+Copy code
+Account savings = new WithdrawableAccount();
+savings.showBalance();
+
+Account fixedDeposit = new FixedDepositAccount();
+fixedDeposit.showBalance();
+
+// Withdraw only from withdrawable accounts
+WithdrawableAccount withdrawable = (WithdrawableAccount) savings;
+withdrawable.withdraw(500);
+Comparison: Simple vs. Advanced Example
+Simple Example:
+
+Focused on toys with basic methods like play().
+Violating LSP occurs when some toys cannot perform the behavior defined in the base class.
+Fixing involves creating specialized interfaces or classes for shared and unique behaviors.
+Advanced Example:
+
+Deals with more complex, real-world scenarios like banking.
+Violating LSP occurs when specific account types (e.g., fixed deposit) cannot perform actions defined in the base class (e.g., withdraw()).
+Fixing involves separating behavior into distinct hierarchies or interfaces for accounts that share similar capabilities.
+By ensuring your subclasses behave consistently with their superclass, you make your code more robust, reusable, and maintainable.
