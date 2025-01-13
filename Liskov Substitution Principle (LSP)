@@ -1,5 +1,5 @@
 Basic Explanation of LSP
-mubarak
+mubarak2
 Imagine you have a toy store. You have a class called Toy that represents general toys. You also have a specific toy called CarToy.
 
 Now, let’s say you create a play() method in the Toy class that is supposed to make the toy "play its sound."
