@@ -1,0 +1,80 @@
+Why is it important?
+Avoids code bloat: Classes don't need to implement methods they won't use.
+Improves flexibility: Small, focused interfaces make it easier to design and maintain code.
+Encourages modularity: Classes only depend on what they actually use.
+Example Without ISP (Violation)
+Imagine a Bird interface:
+
+java
+Copy code
+public interface Bird {
+    void fly();
+    void swim();
+}
+Now, let's say we have two bird classes:
+
+java
+Copy code
+public class Sparrow implements Bird {
+    @Override
+    public void fly() {
+        System.out.println("Sparrow is flying.");
+    }
+
+    @Override
+    public void swim() {
+        // Sparrow can't swim
+        throw new UnsupportedOperationException("Sparrow can't swim.");
+    }
+}
+
+public class Penguin implements Bird {
+    @Override
+    public void fly() {
+        // Penguin can't fly
+        throw new UnsupportedOperationException("Penguin can't fly.");
+    }
+
+    @Override
+    public void swim() {
+        System.out.println("Penguin is swimming.");
+    }
+}
+Problem:
+The Sparrow class doesn't need swim(), and the Penguin class doesn't need fly().
+Both classes are forced to implement methods they don't use, leading to unnecessary code.
+Example With ISP (Solution)
+Break the Bird interface into smaller, focused interfaces:
+
+java
+Copy code
+public interface Flyable {
+    void fly();
+}
+
+public interface Swimmable {
+    void swim();
+}
+Now, implement only the interfaces that each bird needs:
+
+java
+Copy code
+public class Sparrow implements Flyable {
+    @Override
+    public void fly() {
+        System.out.println("Sparrow is flying.");
+    }
+}
+
+public class Penguin implements Swimmable {
+    @Override
+    public void swim() {
+        System.out.println("Penguin is swimming.");
+    }
+}
+Benefits:
+Sparrow only implements Flyable, so it doesn't need to handle swimming logic.
+Penguin only implements Swimmable, so it doesn't need to deal with flying.
+Code is more modular and easier to extend.
+Summary:
+The Interface Segregation Principle ensures that interfaces are tailored to the specific needs of the classes implementing them. It avoids forcing classes to include methods they don’t use, resulting in cleaner, more maintainable code.
